@@ -50,6 +50,7 @@
 #include "misc.h"
 #include "save_pass.h"
 #include "echo.h"
+#include "as.h"
 
 #ifndef DISABLE_CHANGE_PASSWORD
 #include <openssl/evp.h>
@@ -65,6 +66,7 @@ LRESULT CALLBACK WindowProcedure (HWND, UINT, WPARAM, LPARAM);
 static void ShowSettingsDialog();
 void CloseApplication(HWND hwnd);
 void ImportConfigFile();
+void ImportConfigFromAS();
 
 /*  Class name and window title  */
 TCHAR szClassName[ ] = _T("OpenVPN-GUI");
@@ -542,6 +544,9 @@ LRESULT CALLBACK WindowProcedure (HWND hwnd, UINT message, WPARAM wParam, LPARAM
       /* we first check global menu items which do not require a connnection index */
       if (LOWORD(wParam) == IDM_IMPORT) {
         ImportConfigFile();
+      }
+      else if (LOWORD(wParam) == IDM_IMPORT_AS) {
+        ImportConfigFromAS();
       }
       else if (LOWORD(wParam) == IDM_SETTINGS) {
         ShowSettingsDialog();

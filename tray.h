@@ -32,6 +32,7 @@
 #define IDM_SETTINGS            221
 #define IDM_CLOSE               223
 #define IDM_IMPORT              224
+#define IDM_IMPORT_AS           225
 
 #define IDM_CONNECTMENU         300
 #define IDM_DISCONNECTMENU      (1 + IDM_CONNECTMENU)
