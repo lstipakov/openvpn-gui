@@ -145,10 +145,11 @@
 #define ID_DLG_MESSAGE                   300
 #define ID_TXT_MESSAGE                   301
 
-/* AS Profile Import dialog */
+/* AS Profile Import */
 #define ID_DLG_AS_PROFILE_IMPORT         400
 #define ID_EDT_URL                       401
 #define ID_CHK_AUTOLOGIN                 402
+#define IDS_ERR_AS_IMPORT_PROFILE        403
 
 /*
  * String Table Resources
