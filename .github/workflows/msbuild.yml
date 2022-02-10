@@ -82,7 +82,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: '~/mingw/'
-          key: ${{ matrix.target }}-mingw-${{ ${{matrix.openssl_version}} }}
+          key: ${{ matrix.target }}-mingw-${{ matrix.openssl_version }}
           
       - name: Download mingw dependencies
         if: steps.cache.outputs.cache-hit != 'true'
