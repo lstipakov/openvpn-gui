@@ -19,6 +19,8 @@ jobs:
       CHOST: ${{ matrix.chost }}
       TARGET: ${{ matrix.target }}
     steps:
+      - name: Install dependencies
+        run: sudo apt update && sudo apt install -y mingw-w64 libtool automake autoconf libssl-dev
       - name: Checkout
         uses: actions/checkout@v2
       - name: autoconf
