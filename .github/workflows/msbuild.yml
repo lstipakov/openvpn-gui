@@ -44,6 +44,7 @@ jobs:
         run: |
           wget -c -P download-cache/ "https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz"
           tar zxf "download-cache/openssl-${OPENSSL_VERSION}.tar.gz"
+          ls -la
 
       - name: Configure OpenSSL
         if: steps.cache.outputs.cache-hit != 'true'
