@@ -2,72 +2,7 @@
 name: Build
 on: [push, pull_request]
 
-jobs:
-  mingw:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - target: mingw64
-            chost: x86_64-w64-mingw32
-          - target: mingw
-            chost: i686-w64-mingw32
-    name: "gcc-mingw - ${{matrix.target}}"
-    runs-on: ubuntu-20.04
-    env:
-      MAKEFLAGS: -j3
-      CHOST: ${{ matrix.chost }}
-      TARGET: ${{ matrix.target }}
-      OPENSSL_VERSION: 1.1.1m
-    steps:
-      - name: Install dependencies
-        run: sudo apt update && sudo apt install -y mingw-w64 libtool automake autoconf
-        
-      - name: Checkout
-        uses: actions/checkout@v2
-        with:
-          path: openvpn-gui
-        
-      - name: autoconf
-        run: autoreconf -fvi
-        working-directory: openvpn-gui
-      
-      - name: Cache dependencies
-        id: cache
-        uses: actions/cache@v2
-        with:
-          path: '~/mingw/'
-          key: ${{ matrix.target }}-mingw-${{ env.OPENSSL_VERSION }}
-          
-      - name: Download mingw depnendencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          wget -c -P download-cache/ "https://www.openssl.org/source/openssl-${{ env.OPENSSL_VERSION }}.tar.gz"
-          tar zxf "download-cache/openssl-${{ env.OPENSSL_VERSION }}.tar.gz"
-
-      - name: Configure OpenSSL
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: ./Configure --cross-compile-prefix=${CHOST}- shared ${{ matrix.target }} no-capieng --prefix="${HOME}/mingw/opt" --openssldir="${HOME}/mingw/opt" -static-libgcc
-        working-directory: "./${{ env.OPENSSL_VERSION }}"
-
-      - name: Build OpenSSL
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: make
-        working-directory: "./${{ env.OPENSSL_VERSION }}"
-
-      - name: Install OpenSSL
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: make install
-        working-directory: "./${{ env.OPENSSL_VERSION }}"
-        
-      - name: configure      
-        run: PKG_CONFIG_PATH=${HOME}/mingw/opt/lib/pkgconfig ./configure --host=${CHOST} --enable-password-change=yes
-        working-directory: openvpn-gui
-        
-      - name: make
-        run: make
-        working-directory: openvpn-gui
-
+jobs:  
   msvc:
     strategy:
       matrix:
@@ -108,3 +43,72 @@ jobs:
       with:
         name: openvpn-gui ${{ matrix.arch }}
         path: '${{ env.buildDir }}/openvpn-gui.exe'
+
+  mingw:
+    strategy:
+      fail-fast: false
+      matrix:
+        openssl_version: [1.1.1m]
+        include:
+          - target: mingw64
+            chost: x86_64-w64-mingw32
+          - target: mingw
+            chost: i686-w64-mingw32
+
+    name: "gcc-mingw - ${{matrix.target}}"
+    runs-on: ubuntu-20.04
+    
+    env:
+      MAKEFLAGS: -j3
+      CHOST: ${{ matrix.chost }}
+      TARGET: ${{ matrix.target }}
+      OPENSSL_VERSION: 1.1.1m
+      
+    steps:
+      - name: Install dependencies
+        run: sudo apt update && sudo apt install -y mingw-w64 libtool automake autoconf
+        
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          path: openvpn-gui
+        
+      - name: autoconf
+        run: autoreconf -fvi
+        working-directory: openvpn-gui
+      
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: '~/mingw/'
+          key: ${{ matrix.target }}-mingw-${{ ${{matrix.openssl_version}} }}
+          
+      - name: Download mingw dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          wget -c -P download-cache/ "https://www.openssl.org/source/openssl-${{ env.OPENSSL_VERSION }}.tar.gz"
+          tar zxf "download-cache/openssl-${{ matrix.openssl_version }}.tar.gz"
+
+      - name: Configure OpenSSL
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: ./Configure --cross-compile-prefix=${CHOST}- shared ${{ matrix.target }} no-capieng --prefix="${HOME}/mingw/opt" --openssldir="${HOME}/mingw/opt" -static-libgcc
+        working-directory: "./${{ matrix.openssl_version }}"
+
+      - name: Build OpenSSL
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: make
+        working-directory: "./${{ matrix.openssl_version }}"
+
+      - name: Install OpenSSL
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: make install
+        working-directory: "./${{ matrix.openssl_version }}"
+        
+      - name: configure      
+        run: PKG_CONFIG_PATH=${HOME}/mingw/opt/lib/pkgconfig ./configure --host=${CHOST} --enable-password-change=yes
+        working-directory: openvpn-gui
+        
+      - name: make
+        run: make
+        working-directory: openvpn-gui
