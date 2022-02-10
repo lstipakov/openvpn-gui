@@ -19,6 +19,8 @@ jobs:
       CHOST: ${{ matrix.chost }}
       TARGET: ${{ matrix.target }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
       - name: autoconf
         run: autoreconf -fvi
       - name: configure
