@@ -61,7 +61,7 @@ jobs:
         working-directory: "./${{ env.OPENSSL_VERSION }}"
         
       - name: configure      
-        run: PKG_CONFIG_PATH=${HOME}/mingw/opt/lib/pkgconfig ./configure --host=${CHOST}
+        run: PKG_CONFIG_PATH=${HOME}/mingw/opt/lib/pkgconfig ./configure --host=${CHOST} --enable_password_change=yes
         working-directory: openvpn-gui
         
       - name: make
