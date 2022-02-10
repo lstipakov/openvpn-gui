@@ -3,6 +3,27 @@ name: Build
 on: [push, pull_request]
 
 jobs:
+  mingw:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: mingw64
+            chost: x86_64-w64-mingw32
+          - target: mingw
+            chost: i686-w64-mingw32
+    name: "gcc-mingw - ${{matrix.target}}"
+    runs-on: ubuntu-20.04
+    env:
+      MAKEFLAGS: -j3
+      CHOST: ${{ matrix.chost }}
+      TARGET: ${{ matrix.target }}
+    steps:
+      - name: autoconf
+        run: autoreconf -fvi
+      - name: configure
+        run: ./configure --host=${CHOST}
+
   msvc:
     strategy:
       matrix:
