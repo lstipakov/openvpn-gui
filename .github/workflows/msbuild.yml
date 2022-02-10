@@ -18,15 +18,48 @@ jobs:
       MAKEFLAGS: -j3
       CHOST: ${{ matrix.chost }}
       TARGET: ${{ matrix.target }}
+      OPENSSL_VERSION: 1.1.1m
     steps:
       - name: Install dependencies
-        run: sudo apt update && sudo apt install -y mingw-w64 libtool automake autoconf libssl-dev
+        run: sudo apt update && sudo apt install -y mingw-w64 libtool automake autoconf
+        
       - name: Checkout
         uses: actions/checkout@v2
+        
       - name: autoconf
         run: autoreconf -fvi
+      
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v2
+        with:
+          path: '~/mingw/'
+          key: ${{ matrix.target }}-mingw-${{ env.OPENSSL_VERSION }}
+          
+      - name: Download mingw depnendencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          wget -c -P download-cache/ "https://www.openssl.org/source/old/1.1.1/openssl-${OPENSSL_VERSION}.tar.gz"
+          tar zxf "download-cache/openssl-${OPENSSL_VERSION}.tar.gz"
+
+      - name: Configure OpenSSL
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: ./Configure --cross-compile-prefix=${CHOST}- shared ${{ matrix.target }} no-capieng --prefix="${HOME}/mingw/opt" --openssldir="${HOME}/mingw/opt" -static-libgcc
+        working-directory: "./openssl-${OPENSSL_VERSION}"
+
+      - name: Build OpenSSL
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: make
+        working-directory: "./openssl-${OPENSSL_VERSION}"
+
+      - name: Install OpenSSL
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: make install
+        working-directory: "./openssl-${OPENSSL_VERSION}"
+        
       - name: configure      
-        run: ./configure --host=${CHOST}
+        run: PKG_CONFIG_PATH=${HOME}/mingw/opt/lib/pkgconfig ./configure --host=${CHOST}
+        
       - name: make
         run: make
 
