@@ -23,8 +23,10 @@ jobs:
         uses: actions/checkout@v2
       - name: autoconf
         run: autoreconf -fvi
-      - name: configure
+      - name: configure      
         run: ./configure --host=${CHOST}
+      - name: make
+        run: make
 
   msvc:
     strategy:
