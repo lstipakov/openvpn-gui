@@ -49,17 +49,17 @@ jobs:
       - name: Configure OpenSSL
         if: steps.cache.outputs.cache-hit != 'true'
         run: ./Configure --cross-compile-prefix=${CHOST}- shared ${{ matrix.target }} no-capieng --prefix="${HOME}/mingw/opt" --openssldir="${HOME}/mingw/opt" -static-libgcc
-        working-directory: "./openssl-${OPENSSL_VERSION}"
+        working-directory: "./openssl-1.1.1m"
 
       - name: Build OpenSSL
         if: steps.cache.outputs.cache-hit != 'true'
         run: make
-        working-directory: "./openssl-${OPENSSL_VERSION}"
+        working-directory: "./openssl-1.1.1m"
 
       - name: Install OpenSSL
         if: steps.cache.outputs.cache-hit != 'true'
         run: make install
-        working-directory: "./openssl-${OPENSSL_VERSION}"
+        working-directory: "./openssl-1.1.1m"
         
       - name: configure      
         run: PKG_CONFIG_PATH=${HOME}/mingw/opt/lib/pkgconfig ./configure --host=${CHOST}
