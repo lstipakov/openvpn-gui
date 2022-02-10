@@ -25,9 +25,12 @@ jobs:
         
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          path: openvpn-gui
         
       - name: autoconf
         run: autoreconf -fvi
+        working-directory: openvpn-gui
       
       - name: Cache dependencies
         id: cache
@@ -59,9 +62,11 @@ jobs:
         
       - name: configure      
         run: PKG_CONFIG_PATH=${HOME}/mingw/opt/lib/pkgconfig ./configure --host=${CHOST}
+        working-directory: openvpn-gui
         
       - name: make
         run: make
+        working-directory: openvpn-gui
 
   msvc:
     strategy:
