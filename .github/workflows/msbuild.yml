@@ -49,6 +49,7 @@ jobs:
       fail-fast: false
       matrix:
         openssl_version: [1.1.1m]
+        target: [mingw64, mingw]
         include:
           - target: mingw64
             chost: x86_64-w64-mingw32
