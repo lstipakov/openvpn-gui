@@ -56,7 +56,7 @@ jobs:
           - target: mingw
             chost: i686-w64-mingw32
 
-    name: "gcc-mingw - ${{matrix.target}}"
+    name: "gcc-mingw - ${{matrix.target}} - ossl${{ matrix.openssl_version }}"
     runs-on: ubuntu-20.04
     
     env:
