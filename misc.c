@@ -185,36 +185,40 @@ out:
 char *
 escape_string(const char *input)
 {
-    char *out = strdup(input);
     const char *esc = "\"\\ ";
+    int input_len = strlen(input);
 
+    /* calculate extra space needed for escaping */
+    int extra_space = 0;
+    for (int i = 0; i < input_len; ++i)
+    {
+        if (strchr(esc, input[i]))
+        {
+            ++extra_space;
+        }
+    }
+
+    /* allocate a new buffer */
+    char *out = (char *)malloc(input_len + extra_space + 1);
     if (!out)
     {
         MsgToEventLog(EVENTLOG_ERROR_TYPE, L"Error in escape_string: out of memory");
         return NULL;
     }
 
-    int len = strlen(out);
-
-    for (int pos = 0; pos < len; ++pos)
+    /* copy characters from old to new buffer, adding escaping when needed */
+    int pos = 0;
+    for (int i = 0; i < input_len; ++i)
     {
-        if (strchr(esc, out[pos]))
+        if (strchr(esc, input[i]))
         {
-            char *buf = realloc(out, ++len + 1);
-            if (buf == NULL)
-            {
-                free(out);
-                MsgToEventLog(EVENTLOG_ERROR_TYPE, L"Error in escape_string: out of memory");
-                return NULL;
-            }
-            out = buf;
-            memmove(out + pos + 1, out + pos, len - pos + 1);
-            out[pos] = '\\';
-            pos += 1;
+            out[pos++] = '\\';
         }
+        out[pos++] = input[i];
     }
+    out[pos] = '\0';
 
-    PrintDebug(L"escape_string: in: '%hs' out: '%hs' len = %d", input, out, len);
+    PrintDebug(L"escape_string: in: '%hs' out: '%hs' len = %d", input, out, input_len);
     return out;
 }
 
